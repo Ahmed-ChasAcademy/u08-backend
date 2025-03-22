@@ -14,6 +14,8 @@ Node.js är en runtime-miljö där javascript kan beräknas utanför webbläsarn
 Express.js-ramverket ställer in servern mellan backend och frontend, det hjälper till att ställa in routing, mellanprogram, HTTP-förfrågningar och svar, felhantering och säkerhetsfunktioner. Det hjälper till att smidiga integrationen med bibliotek för backend-utveckling i javascript 
 
 **4. Beskriv vad som utmärker en relationsdatabas. Ge exempel utifrån den SQL-form du arbetat med under kursen (d.v.s MySQL, PostgreSQL etc)**
+En relationsdatabas organiserar data i tabeller med rader och kolumner, där varje tabell representerar en enhet (som användare eller jobb). Tabeller länkas med primärnycklar (unika identifierare) och främmande nycklar (referenser till andra tabeller), vilket säkerställer strukturerade relationer.
+
 
 **5. Vad menas med "one-to-one", "one-to-many", "many-to-many" inom relationsdatabaser?**
 
@@ -34,6 +36,9 @@ REST (Representational State Transfer) är en arkitektonisk stil för att design
 Enkelt uttryckt gör REST det enkelt för olika programvarusystem att kommunicera över webben genom att använda vanliga HTTP-förfrågningar för att hantera resurser.
 
 **10. Vilka kriterier ska uppfyllas för att ett API ska anses vara RESTful? Redogör enligt Richardson Maturity Model.**
+För att ett API ska anses RESTful enligt **Richardson Maturity Model** måste det uppfylla fyra nivåer. På nivå 0 används HTTP endast som en transportmekanism utan att följa REST-principerna. Nivå 1 introducerar tydliga resurser, såsom `/users` och `/jobs`, istället för att förlita sig på en enda slutpunkt. På nivå 2 använder API:et korrekt HTTP-metoder som "GET", "POST", "PUT" och "DELETE", tillsammans med lämpliga statuskoder. Nivå 3, känd som HATEOAS, innebär att API:et inkluderar länkar i sina svar för att vägleda klienten om möjliga nästa åtgärder. Ett API anses vara fullt RESTful endast när det uppfyller alla dessa nivåer.
+
+
 
 **11. . Vad är en HTTP-statuskod? Beskriv några av de viktigaste.**
 
@@ -51,3 +56,4 @@ Enkelt uttryckt gör REST det enkelt för olika programvarusystem att kommunicer
 
 
 **13. Vad är CORS? Hur kan man sätta olika inställningar i CORS i Express?**
+CORS (Cross-Origin Resource Sharing) är som en säkerhetsvakt för ditt API. Det bestämmer vem (vilka webbplatser) som kan prata med din server. Som standard blockerar webbläsare förfrågningar från olika webbplatser av säkerhetsskäl. CORS låter dig styra vilka webbplatser som är tillåtna.
