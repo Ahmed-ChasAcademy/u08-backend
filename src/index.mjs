@@ -1,61 +1,88 @@
 import express from "express";
+import { PrismaClient } from "@prisma/client";
+import { hashedPassword } from "../utils/helpers.mjs";
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const prisma = new PrismaClient();
 
-const pets = [
-  { id: 1, pet_name: "Simone", pet_type: "Pie, indian tree" },
-  { id: 2, pet_name: "Fernande", pet_type: "Arboral spiny rat" },
-  { id: 3, pet_name: "Ikey", pet_type: "Savannah deer" },
-  { id: 4, pet_name: "Bronnie", pet_type: "Bleeding heart monkey" },
-  { id: 5, pet_name: "Dian", pet_type: "Macaque, bonnet" },
-  { id: 6, pet_name: "Darren", pet_type: "Coatimundi, ring-tailed" },
-  { id: 7, pet_name: "Gaston", pet_type: "Wallaby, agile" },
-  { id: 8, pet_name: "Peyton", pet_type: "Tenrec, tailless" },
-  { id: 9, pet_name: "Isador", pet_type: "Bear, grizzly" },
-  { id: 10, pet_name: "Ellis", pet_type: "Eurasian hoopoe" },
-];
-
-app.listen(PORT, () => {
-  console.log(`Running on http://localhost:${PORT}`);
-});
+app.use(express.json());
 
 
-
-//routing to homepage/first page
 app.get("/", (req, res) => {
-  res.status(200).send({ message: "hello" });
+  res.send("Hello, world!");
+});
+
+// Create a Person
+app.post("/person", async (req, res) => {
+  const { name, email, password } = req.body; 
+
+  try {
+    // Hash the password before saving
+    const hashedPwd = await hashedPassword(password);
+
+    
+    const person = await prisma.person.create({
+      data: {
+        name,
+        email,
+        password: hashedPwd, 
+      },
+    });
+
+    
+    res.json(person);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error creating person" });
+  }
 });
 
 
-
-//simple route to users
-app.get("/pets", (req, res) => {
-    res.send(pets)
-})
-
-
-
-
-// Find with Params
-app.get("/pets/:id", (req, res) => {
-    console.log(req.params);
-    
-    const parsedId = parseInt(req.params.id);
-    if (isNaN(parsedId)) {
-      return res.status(400).send({ msg: "bad request" });
-    }
-  
-    const findPet = pets.find((pet) => pet.id === parsedId);
-    if (!findPet) {
-      return res.status(404).send({ msg: "Pet not found" });
-    }
-  
-    return res.send(findPet);
-  });
+app.get("/people", async (req, res) => {
+  try {
+    const people = await prisma.person.findMany();
+    res.json(people);
+  } catch (error) {
+    res.status(500).json({ error: "Error fetching people" });
+  }
+});
 
 
-app.post('/pets', (req,res) => {
-    console.log(req.body);
-    return res.sendStatus(201);
-})
+app.post("/pet", async (req, res) => {
+  const { name, type, ownerId } = req.body;
+
+  try {
+    const pet = await prisma.pet.create({
+      data: {
+        name,
+        type,
+        ownerId,
+      },
+    });
+    res.json(pet);
+  } catch (error) {
+    res.status(500).json({ error: "Error creating pet" });
+  }
+});
+
+
+app.get("/pets/:ownerId", async (req, res) => {
+  const ownerId = parseInt(req.params.ownerId);
+
+  try {
+    const pets = await prisma.pet.findMany({
+      where: {
+        ownerId,
+      },
+    });
+    res.json(pets);
+  } catch (error) {
+    res.status(500).json({ error: "Error fetching pets" });
+  }
+});
+
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
