@@ -1,6 +1,7 @@
 import express from "express";
 import { PrismaClient } from "@prisma/client";
 import { hashedPassword } from "../utils/helpers.mjs";
+import { generateToken } from '../utils/auth.mjs';  
 
 const app = express();
 const prisma = new PrismaClient();
@@ -8,9 +9,41 @@ const prisma = new PrismaClient();
 app.use(express.json());
 
 
-app.get("/", (req, res) => {
-  res.send("Hello, world!");
+import bcrypt from 'bcrypt';
+
+
+// Add login route
+app.post('/login', async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    // Find user by email
+    const person = await prisma.person.findUnique({
+      where: { email },
+    });
+
+    if (!person) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Compare provided password with stored hashed password
+    const isPasswordValid = await bcrypt.compare(password, person.password);
+
+    if (!isPasswordValid) {
+      return res.status(401).json({ error: 'Invalid password' });
+    }
+
+    // If valid, generate a JWT token
+    const token = generateToken(person);
+
+    // Send the token in the response
+    res.json({ token });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Login failed' });
+  }
 });
+
 
 // Create a Person
 app.post("/person", async (req, res) => {
