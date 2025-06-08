@@ -17,7 +17,7 @@ app.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    // Find user by email
+    
     const person = await prisma.person.findUnique({
       where: { email },
     });
@@ -26,17 +26,17 @@ app.post('/login', async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    // Compare provided password with stored hashed password
+    
     const isPasswordValid = await bcrypt.compare(password, person.password);
 
     if (!isPasswordValid) {
       return res.status(401).json({ error: 'Invalid password' });
     }
 
-    // If valid, generate a JWT token
+    
     const token = generateToken(person);
 
-    // Send the token in the response
+    
     res.json({ token });
   } catch (error) {
     console.error(error);
@@ -45,7 +45,7 @@ app.post('/login', async (req, res) => {
 });
 
 
-// Create a Person
+
 app.post("/person", async (req, res) => {
   const { name, email, password } = req.body; 
 
